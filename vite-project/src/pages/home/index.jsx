@@ -9,12 +9,6 @@ import BorrowRecord from "@/components/borrowRecord";
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
 
-// const mockData = {
-//   音乐: ["音乐1", "音乐2", "音乐3"],
-//   电影: ["电影1", "电影2", "电影3"],
-//   体育: ["书籍1", "书籍2", "书籍3"],
-//   历史: ["历史1", "历史2", "历史3"],
-// };
 const typemap = {
   0: "系统管理员",
   1: "图书管理员",
@@ -141,7 +135,7 @@ export default function Index() {
   };
 
   return (
-    <Layout className="h-full flex">
+    <>
       <Header className="flex justify-between items-center px-4 bg-white shadow-md h-16">
         <div className="flex justify-between items-center px-4  h-16 w-[900px] mx-auto">
           <div className="logo w-auto h-full text-blue-400 font-bold text-2xl flex justify-center items-center">HZNU图书馆</div>
@@ -204,62 +198,59 @@ export default function Index() {
             })}
           </div>
         </div>
+        {/* 修改手机号和密码 */}
+        <Modal
+          title="修改个人信息"
+          open={visible}
+          onCancel={() => {
+            setVisible(false);
+          }}
+          footer={null}
+        >
+          <Form form={form} layout="vertical" name="form_in_modal">
+            <div className="flex flex-col">
+              {/* 手机号 */}
+              <div className="flex flex-row items-center my-2">
+                <div className="w-32">手机号：</div>
+                <Form.Item name="phoneNumber" className="mb-0">
+                  <Input className="w-64" />
+                </Form.Item>
+                <div onClick={changephoneFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
+                  {loading[0] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
+                </div>
+              </div>
+              {/* 密码 */}
+              <div className="flex flex-row items-center mt-5 mb-2">
+                <div className="w-32">原密码：</div>
+                <Form.Item name="old_pwd" className="mb-0">
+                  <Input.Password className="w-64" />
+                </Form.Item>
+              </div>
+              <div className="flex flex-row items-center my-2">
+                <div className="w-32">新密码：</div>
+                <Form.Item name="new_pwd" className="mb-0">
+                  <Input.Password className="w-64" />
+                </Form.Item>
+                <div onClick={changepwdFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
+                  {loading[1] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
+                </div>
+              </div>
+            </div>
+          </Form>
+        </Modal>
+        {/* 借阅记录 */}
+        <Modal
+          title="借阅记录"
+          open={infoVisible}
+          onCancel={() => {
+            setinfoVisible(false);
+          }}
+          footer={null}
+          width={800}
+        >
+          <BorrowRecord />
+        </Modal>
       </Content>
-      <Footer className="flex justify-center items-center h-16 py-2">
-        <div className="text-gray-400">HZNU图书馆 ©2023 Created by HZNU</div>
-      </Footer>
-      {/* 修改手机号和密码 */}
-      <Modal
-        title="修改个人信息"
-        open={visible}
-        onCancel={() => {
-          setVisible(false);
-        }}
-        footer={null}
-      >
-        <Form form={form} layout="vertical" name="form_in_modal">
-          <div className="flex flex-col">
-            {/* 手机号 */}
-            <div className="flex flex-row items-center my-2">
-              <div className="w-32">手机号：</div>
-              <Form.Item name="phoneNumber" className="mb-0">
-                <Input className="w-64" />
-              </Form.Item>
-              <div onClick={changephoneFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
-                {loading[0] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
-              </div>
-            </div>
-            {/* 密码 */}
-            <div className="flex flex-row items-center mt-5 mb-2">
-              <div className="w-32">原密码：</div>
-              <Form.Item name="old_pwd" className="mb-0">
-                <Input.Password className="w-64" />
-              </Form.Item>
-            </div>
-            <div className="flex flex-row items-center my-2">
-              <div className="w-32">新密码：</div>
-              <Form.Item name="new_pwd" className="mb-0">
-                <Input.Password className="w-64" />
-              </Form.Item>
-              <div onClick={changepwdFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
-                {loading[1] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
-              </div>
-            </div>
-          </div>
-        </Form>
-      </Modal>
-      {/* 借阅记录 */}
-      <Modal
-        title="借阅记录"
-        open={infoVisible}
-        onCancel={() => {
-          setinfoVisible(false);
-        }}
-        footer={null}
-        width={800}
-      >
-        <BorrowRecord />
-      </Modal>
-    </Layout>
+    </>
   );
 }
