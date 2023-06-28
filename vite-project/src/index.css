@@ -1,0 +1,6 @@
+@tailwind base;
+/* 作用：重置浏览器样式，比如去掉默认的margin和padding */
+@tailwind components;
+/* 作用：定义组件样式，比如按钮、表格、表单等 */
+@tailwind utilities; /*  */
+/* 作用：定义实用工具类，比如清除浮动等 */
