@@ -131,7 +131,6 @@ function _post(url, params = {}, option = {}, method = "POST") {
       },
       ...option,
     };
-    console.log("post", options);
     axios(options)
       .then((res) => {
         resolve(res.data);

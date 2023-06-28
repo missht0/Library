@@ -13,11 +13,14 @@ export default function Login() {
     const res = await login(params);
     console.log("login", res);
     if (res.code === 200) {
-      setCookie("userInfo", res.data, 3600);
+      setCookie("userInfo", res.data.id, 3600);
+      setCookie("userType", res.data.userType, 3600);
       navigate("/");
     } else {
       message.error(res.message);
     }
+    // setCookie("userInfo", "lstsb", 3600);
+    // navigate("/");
   };
 
   return (

@@ -165,3 +165,15 @@ export const login = async (param) => {
 export const getbooks = async (param) => {
   return await http.get(USER.getbooks, param);
 };
+// 修改密码
+export const updatePassword = async (param) => {
+  return await http.post(USER.updatePassword, param);
+};
+// 修改手机号
+export const updatePhone = async (param) => {
+  return await http.post(USER.updatePhone, param);
+};
+// 查看读者借阅记录
+export const getBorrowRecord = async (param) => {
+  return await http.get(USER.getBorrowRecords, param);
+};

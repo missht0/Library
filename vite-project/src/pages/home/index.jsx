@@ -1,9 +1,10 @@
-import { Layout, Dropdown, message, Input } from "antd";
-import { DownOutlined, UserOutlined } from "@ant-design/icons";
+import { Layout, Dropdown, message, Input, Modal, Spin, Form, Table } from "antd";
+import { DownOutlined, UserOutlined, CheckCircleOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { getbooks } from "@/services/user";
-import { clearCookie } from "@/utils";
+import { clearCookie, getCookie } from "@/utils";
 import { useNavigate } from "react-router-dom";
+import { getbooks, updatePassword, updatePhone, getBorrowRecord } from "@/services/user";
+import BorrowRecord from "@/components/borrowRecord";
 
 const { Header, Content, Footer } = Layout;
 const { Search } = Input;
@@ -14,11 +15,25 @@ const { Search } = Input;
 //   体育: ["书籍1", "书籍2", "书籍3"],
 //   历史: ["历史1", "历史2", "历史3"],
 // };
+const typemap = {
+  0: "系统管理员",
+  1: "图书管理员",
+  2: "教师",
+  3: "学生",
+};
 
 export default function Index() {
+  const [form] = Form.useForm();
   const navigate = useNavigate();
   const [active, setActive] = useState("全部");
-  const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState({});
+  const [showBooks, setShowBooks] = useState({});
+  const [visible, setVisible] = useState(false);
+  const [infoVisible, setinfoVisible] = useState(false);
+  const [loading, setLoading] = useState({
+    0: false,
+    1: false,
+  });
 
   useEffect(() => {
     getbooksFn();
@@ -33,13 +48,57 @@ export default function Index() {
     });
     data = { 全部: all, ...data };
     setBooks(data);
+    setShowBooks(data);
+  };
+
+  const changephoneFn = () => {
+    setLoading({ ...loading, 0: true });
+    let phoneNumber = form.getFieldValue("phoneNumber");
+    let params = {
+      phoneNumber: phoneNumber,
+      id: getCookie("userInfo"),
+    };
+    updatePhone(params).then((res) => {
+      if (res.code == 200) {
+        message.success("修改成功");
+      } else {
+        message.error("修改失败");
+      }
+      setLoading({ ...loading, 0: false });
+    });
+  };
+
+  const changepwdFn = () => {
+    let params = form.getFieldValue();
+    if (!params.old_pwd || !params.new_pwd) {
+      message.error("密码不能为空");
+      return;
+    }
+    if (params.old_pwd == params.new_pwd) {
+      message.error("新密码不能与原密码相同");
+      return;
+    }
+    setLoading({ ...loading, 1: true });
+    params.id = getCookie("userInfo");
+    updatePassword(params).then((res) => {
+      if (res.code == 200) {
+        message.success("修改成功");
+      } else {
+        message.error("修改失败");
+      }
+      setLoading({ ...loading, 1: false });
+    });
   };
 
   const handleMenuClick = (e) => {
     switch (e.key) {
       case "1":
+        setVisible(true);
         break;
       case "2":
+        setinfoVisible(true);
+        break;
+      case "3":
         // 退出登录
         message.info("退出登录");
         clearCookie("userInfo");
@@ -51,62 +110,76 @@ export default function Index() {
 
     console.log("click", e);
   };
+
   const items = [
     {
       label: "修改个人信息",
       key: "1",
-      icon: <UserOutlined />,
+    },
+    {
+      label: "查看借阅记录",
+      key: "2",
     },
     {
       label: "退出登录",
-      key: "2",
-      icon: <UserOutlined />,
+      key: "3",
     },
   ];
+
   const menuProps = {
     items,
     onClick: handleMenuClick,
   };
+
   const onSearch = (value) => {
     value = value.trim();
+    const data = {};
+    Object.keys(books).forEach((key) => {
+      data[key] = books[key].filter((item) => item?.title.indexOf(value) > -1);
+    });
+    setShowBooks(data);
   };
 
   return (
-    <Layout className="h-full">
+    <Layout className="h-full flex">
       <Header className="flex justify-between items-center px-4 bg-white shadow-md h-16">
         <div className="flex justify-between items-center px-4  h-16 w-[900px] mx-auto">
           <div className="logo w-auto h-full text-blue-400 font-bold text-2xl flex justify-center items-center">HZNU图书馆</div>
-
           <Search size="large" placeholder="输入书名" allowClear onSearch={onSearch} className="w-1/3 h-10" />
-
           <div className="h-full flex justify-end items-center">
             <Dropdown.Button
               menu={menuProps}
               placement="bottom"
               icon={<UserOutlined />}
               onClick={() => {
-                console.log("click");
+                switch (getCookie("userType")) {
+                  case "0":
+                    navigate("/admin");
+                    break;
+                  case "1":
+                    navigate("/manage");
+                    break;
+                  case "2":
+                    break;
+                  case "3":
+                    break;
+                  default:
+                    break;
+                }
               }}
             >
-              读者 | 管理员
+              {typemap[getCookie("userType")]}
             </Dropdown.Button>
           </div>
         </div>
       </Header>
       <Content className="flex h-full">
-        <div className="content w-[840px] mx-auto">
-          <div className="h-48 py-8 flex flex-row flex-wrap ">
-            {/* <div
-              onClick={() => {
-                setActive("all");
-              }}
-              className={`${active == "all" ? "bg-blue-200" : "bg-neutral-100"} min-w-fit mx-4 h-5 px-4 py-4 flex  justify-center items-center  shadow-md rounded-md cursor-pointer hover:bg-blue-200`}
-            >
-              全部
-            </div> */}
-            {Object.keys(books).map((item) => {
+        <div className="content w-[840px] mx-auto h-full flex flex-col">
+          <div className="min-h-[100px] py-8 flex flex-row flex-wrap ">
+            {Object.keys(showBooks).map((item, index) => {
               return (
                 <div
+                  key={index}
                   onClick={() => {
                     setActive(item);
                   }}
@@ -118,13 +191,13 @@ export default function Index() {
             })}
           </div>
 
-          <div>
-            {books[active]?.map((item) => {
+          <div className="h-auto overflow-auto">
+            {showBooks[active]?.map((item, index) => {
               return (
-                <div className="bg-white shadow-md rounded-md mb-4">
-                  <div className="flex justify-between items-center px-4 py-4">
-                    <div className="text-xl font-bold h-40">{item.title}</div>
-                    <div className="text-gray-400">{item.availableQuantity}</div>
+                <div className="bg-white shadow-md rounded-md mb-4" key={index}>
+                  <div className="flex justify-between items-center pl-4 pr-8 py-4">
+                    <div className="text-xl font-bold h-40 w-32 bg-slate-300 rounded-md px-3 py-3 flex justify-center">{item.title}</div>
+                    <div className="text-gray-400 text-lg ">{`余量： ${item.availableQuantity}  本`}</div>
                   </div>
                 </div>
               );
@@ -135,6 +208,58 @@ export default function Index() {
       <Footer className="flex justify-center items-center h-16 py-2">
         <div className="text-gray-400">HZNU图书馆 ©2023 Created by HZNU</div>
       </Footer>
+      {/* 修改手机号和密码 */}
+      <Modal
+        title="修改个人信息"
+        open={visible}
+        onCancel={() => {
+          setVisible(false);
+        }}
+        footer={null}
+      >
+        <Form form={form} layout="vertical" name="form_in_modal">
+          <div className="flex flex-col">
+            {/* 手机号 */}
+            <div className="flex flex-row items-center my-2">
+              <div className="w-32">手机号：</div>
+              <Form.Item name="phoneNumber" className="mb-0">
+                <Input className="w-64" />
+              </Form.Item>
+              <div onClick={changephoneFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
+                {loading[0] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
+              </div>
+            </div>
+            {/* 密码 */}
+            <div className="flex flex-row items-center mt-5 mb-2">
+              <div className="w-32">原密码：</div>
+              <Form.Item name="old_pwd" className="mb-0">
+                <Input.Password className="w-64" />
+              </Form.Item>
+            </div>
+            <div className="flex flex-row items-center my-2">
+              <div className="w-32">新密码：</div>
+              <Form.Item name="new_pwd" className="mb-0">
+                <Input.Password className="w-64" />
+              </Form.Item>
+              <div onClick={changepwdFn} className="ml-5 w-8 h-8 rounded-full flex justify-center items-center  hover:bg-gray-200 cursor-pointer">
+                {loading[1] ? <LoadingOutlined className="text-lg flex justify-center items-center" /> : <CheckCircleOutlined className="text-lg flex justify-center items-center" />}
+              </div>
+            </div>
+          </div>
+        </Form>
+      </Modal>
+      {/* 借阅记录 */}
+      <Modal
+        title="借阅记录"
+        open={infoVisible}
+        onCancel={() => {
+          setinfoVisible(false);
+        }}
+        footer={null}
+        width={800}
+      >
+        <BorrowRecord />
+      </Modal>
     </Layout>
   );
 }

@@ -19,6 +19,22 @@ export default [
         },
         component: Index,
       },
+      {
+        path: "/admin",
+        meta: {
+          title: "Admin",
+          isLogin: true,
+        },
+        component: lazy(() => import("../pages/admin")),
+      },
+      {
+        path: "/manage",
+        meta: {
+          title: "Manage",
+          isLogin: true,
+        },
+        component: lazy(() => import("../pages/manage")),
+      },
     ],
   },
   {
