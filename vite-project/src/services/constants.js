@@ -1,5 +1,3 @@
-const oam = "/caas-oam";
-const caas = "/caas-core";
 const book = "/book";
 const user = "/user";
 
@@ -17,3 +15,19 @@ export const updatePassword = `${user}/pwd`;
 
 // 查看读者借阅记录
 export const getBorrowRecords = `/borrow/user`;
+// 添加图书
+export const addBook = `${book}/add`;
+// 删除图书
+export const deleteBook = `${book}/delete`;
+// 归还图书
+export const returnBook = `${book}/return`;
+// 借阅图书
+export const borrowBook = `${book}/borrow`;
+// 添加用户
+export const addUser = `${user}/add`;
+// 删除用户
+export const deleteUser = `${user}/delete`;
+// 获取所有用户
+export const getAllUser = `${user}/all`;
+// 获取单独用户
+export const getUser = `${user}/one`;

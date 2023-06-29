@@ -177,3 +177,35 @@ export const updatePhone = async (param) => {
 export const getBorrowRecord = async (param) => {
   return await http.get(USER.getBorrowRecords, param);
 };
+// 添加图书
+export const addBook = async (param) => {
+  return await http.post(USER.addBook, param);
+};
+// 删除图书
+export const deleteBook = async (param) => {
+  return await http.post(USER.deleteBook, param);
+};
+// 归还图书
+export const returnBook = async (param) => {
+  return await http.post(USER.returnBook, param);
+};
+// 借阅图书
+export const borrowBook = async (param) => {
+  return await http.post(USER.borrowBook, param);
+};
+// 添加用户
+export const addUser = async (param) => {
+  return await http.post(USER.addUser, param);
+};
+// 删除用户
+export const deleteUser = async (param) => {
+  return await http.post(USER.deleteUser, param);
+};
+// 获取用户列表
+export const getUsers = async (param) => {
+  return await http.get(USER.getAllUser, param);
+};
+// 获取单独用户
+export const getUser = async (param) => {
+  return await http.get(USER.getUser, param);
+};
