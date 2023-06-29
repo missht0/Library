@@ -105,23 +105,38 @@ export default function Index() {
     console.log("click", e);
   };
 
-  const items = [
-    {
-      label: "修改个人信息",
-      key: "1",
-    },
-    {
-      label: "查看借阅记录",
-      key: "2",
-    },
-    {
-      label: "退出登录",
-      key: "3",
-    },
-  ];
+  const items = () => {
+    if (getCookie("userType") === "0" || getCookie("userType") === "1") {
+      return [
+        {
+          key: "1",
+          label: "修改个人信息",
+        },
+        {
+          key: "3",
+          label: "退出登录",
+        },
+      ];
+    } else {
+      return [
+        {
+          label: "修改个人信息",
+          key: "1",
+        },
+        {
+          label: "查看借阅记录",
+          key: "2",
+        },
+        {
+          label: "退出登录",
+          key: "3",
+        },
+      ];
+    }
+  };
 
   const menuProps = {
-    items,
+    items: items(),
     onClick: handleMenuClick,
   };
 
