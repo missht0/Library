@@ -1,6 +1,7 @@
 import { Layout, Dropdown, message, Input, Modal, Spin, Form, Table, Button, Divider, Select, InputNumber, Popconfirm } from "antd";
 import { DownOutlined, UserOutlined, CheckCircleOutlined, LoadingOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import dayjs from "dayjs";
 import { clearCookie, getCookie } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { getbooks, updatePassword, updatePhone, getBorrowRecord, addBook, deleteBook, addUser, getUsers, deleteUser, borrowBook } from "@/services/user";
@@ -48,6 +49,7 @@ export default function Manage() {
   const [queryId, setQueryId] = useState(undefined);
   const [bookID, setBookID] = useState(undefined);
   const [users, setUsers] = useState([]);
+  const [debt, setDebt] = useState(0);
 
   useEffect(() => {
     getbooksFn();
@@ -84,6 +86,23 @@ export default function Manage() {
     });
   };
 
+  const checkdebt = async (id) => {
+    const res = await getBorrowRecord({
+      userId: id,
+    });
+    let debt = 0;
+    res.data.forEach((item) => {
+      if (item.status !== "return") {
+        let d = dayjs().diff(dayjs(item.dueDate), "day") * 0.1;
+        if (d > 0) {
+          debt += d;
+        }
+      }
+    });
+    setDebt(debt);
+    return debt;
+  };
+
   const handleMenuClick = (e) => {
     switch (e.key) {
       case "3":
@@ -95,8 +114,6 @@ export default function Manage() {
       default:
         break;
     }
-
-    console.log("click", e);
   };
   const items = [
     {
@@ -426,25 +443,35 @@ export default function Manage() {
         open={borrowOpen}
         onCancel={() => {
           setBorrowOpen(false);
+          setDebt(0);
         }}
         footer={null}
       >
         <Search
           placeholder="输入学号"
-          allowClear
-          enterButton="确定"
+          enterButton={debt ? "还款并借阅" : "确定借阅"}
           size="large"
           onSearch={async (value) => {
-            const res = await borrowBook({
-              userId: value,
-              bookId: bookID,
-            });
-            if (res.code === 200) {
-              message.success("借阅成功");
-              setBorrowOpen(false);
-              getbooksFn();
-            } else {
-              message.error("借阅失败");
+            let d = await checkdebt(value);
+            if (d > 0 && debt == 0) {
+              message.error("请先还清欠款");
+              return;
+            } else if (debt == d) {
+              const res = await borrowBook({
+                userId: value,
+                bookId: bookID,
+              });
+              if (res.code === 200) {
+                message.success("借阅成功");
+                setBorrowOpen(false);
+                getbooksFn();
+                if (debt > 0) {
+                  message.success("还款成功");
+                  setDebt(0);
+                }
+              } else {
+                message.error("借阅失败");
+              }
             }
           }}
         />
