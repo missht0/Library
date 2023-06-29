@@ -3,7 +3,7 @@ import { DownOutlined, UserOutlined, CheckCircleOutlined, LoadingOutlined } from
 import { useEffect, useState } from "react";
 import { clearCookie, getCookie } from "@/utils";
 import { useNavigate } from "react-router-dom";
-import { getbooks, updatePassword, updatePhone, getBorrowRecord } from "@/services/user";
+import { getbooks, updatePassword, updatePhone, getBorrowRecord, getUser } from "@/services/user";
 import BorrowRecord from "@/components/borrowRecord";
 
 const { Header, Content, Footer } = Layout;
@@ -43,6 +43,18 @@ export default function Index() {
     data = { 全部: all, ...data };
     setBooks(data);
     setShowBooks(data);
+  };
+
+  const getUserFn = async () => {
+    const res = await getUser({
+      id: getCookie("userInfo"),
+    });
+    console.log(res.data);
+    form.setFieldsValue({
+      phoneNumber: res.data.phoneNumber,
+      name: res.data.name,
+      id: res.data.id,
+    });
   };
 
   const changephoneFn = () => {
@@ -87,6 +99,7 @@ export default function Index() {
   const handleMenuClick = (e) => {
     switch (e.key) {
       case "1":
+        getUserFn();
         setVisible(true);
         break;
       case "2":
@@ -110,7 +123,7 @@ export default function Index() {
       return [
         {
           key: "1",
-          label: "修改个人信息",
+          label: "查看和修改个人信息",
         },
         {
           key: "3",
@@ -120,7 +133,7 @@ export default function Index() {
     } else {
       return [
         {
-          label: "修改个人信息",
+          label: "查看和修改个人信息",
           key: "1",
         },
         {
@@ -208,7 +221,7 @@ export default function Index() {
                     <div className="text-xl font-bold h-40 w-32 bg-slate-300 rounded-md px-3 py-3 flex justify-center">
                       <span>{item.title}</span>
                     </div>
-                    <div className='flex flex-col gap-2 text-base font-normal w-60'>
+                    <div className="flex flex-col gap-2 text-base font-normal w-60">
                       <div>作者：{item.author}</div>
                       <div>出版社：{item.publisher}</div>
                       <div>分类：{item.category}</div>
@@ -222,15 +235,30 @@ export default function Index() {
         </div>
         {/* 修改手机号和密码 */}
         <Modal
-          title="修改个人信息"
+          title="查询和修改个人信息"
           open={visible}
           onCancel={() => {
             setVisible(false);
           }}
           footer={null}
         >
-          <Form form={form} layout="vertical" name="form_in_modal">
+          <Form form={form} layout="vertical" name="form_in_modal" preserve={false}>
             <div className="flex flex-col">
+              {/* 名字 */}
+              <div className="flex flex-row items-center my-2">
+                <div className="w-32">姓名：</div>
+                <Form.Item name="name" className="mb-0">
+                  <Input disabled className="w-64" />
+                </Form.Item>
+              </div>
+              {/* 学号 */}
+              <div className="flex flex-row items-center my-2">
+                <div className="w-32">学号：</div>
+                <Form.Item name="id" className="mb-0">
+                  <Input disabled className="w-64" />
+                </Form.Item>
+              </div>
+
               {/* 手机号 */}
               <div className="flex flex-row items-center my-2">
                 <div className="w-32">手机号：</div>
