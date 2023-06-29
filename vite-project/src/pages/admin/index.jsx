@@ -26,6 +26,9 @@ export default function Admin() {
         return item.userType === "1";
       })
     );
+    console.log(res.data.filter((item) => {
+      return item.userType === "1";
+    }));
   };
 
   const handleMenuClick = (e) => {
@@ -128,7 +131,7 @@ export default function Admin() {
             </Button>
           </div>
           <div className="content w-[840px] mx-auto h-full flex flex-col">
-            <Table dataSource={users} columns={columns} />
+            <Table rowKey={'id'} dataSource={users} columns={columns} />
           </div>
         </div>
       </Content>

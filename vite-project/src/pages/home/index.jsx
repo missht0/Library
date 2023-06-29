@@ -205,7 +205,14 @@ export default function Index() {
               return (
                 <div className="bg-white shadow-md rounded-md mb-4" key={index}>
                   <div className="flex justify-between items-center pl-4 pr-8 py-4">
-                    <div className="text-xl font-bold h-40 w-32 bg-slate-300 rounded-md px-3 py-3 flex justify-center">{item.title}</div>
+                    <div className="text-xl font-bold h-40 w-32 bg-slate-300 rounded-md px-3 py-3 flex justify-center">
+                      <span>{item.title}</span>
+                    </div>
+                    <div className='flex flex-col gap-2 text-base font-normal w-60'>
+                      <div>作者：{item.author}</div>
+                      <div>出版社：{item.publisher}</div>
+                      <div>分类：{item.category}</div>
+                    </div>
                     <div className="text-gray-400 text-lg ">{`余量： ${item.availableQuantity}  本`}</div>
                   </div>
                 </div>

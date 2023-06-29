@@ -79,5 +79,5 @@ export default function BorrowRecord(props) {
     },
   ];
 
-  return <Table columns={columns} dataSource={info} />;
+  return <Table rowKey={'borrowingID'} columns={columns} dataSource={info} />;
 }
