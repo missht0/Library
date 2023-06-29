@@ -136,7 +136,7 @@ export default function Admin() {
         </div>
       </Content>
       <Modal
-        title="新增读者"
+        title="新增图书管理员"
         open={userOpen}
         onCancel={() => {
           setUserOpen(false);
