@@ -156,7 +156,9 @@ export default function Manage() {
       key: "availableQuantity",
     },
     {
-      title: "操作",
+      title: () => {
+        return <span className="pl-4">操作</span>;
+      },
       key: "action",
       render: (text, record) => (
         <>
@@ -359,7 +361,7 @@ export default function Manage() {
       >
         <div className="w-full flex justify-between">
           <Search
-            placeholder="input search text"
+            placeholder="输入学号"
             onSearch={async (value) => {
               setQueryId(value);
             }}
